@@ -101,6 +101,7 @@ export const PROJECTS = [
       "linear-gradient(170deg, #f5f0eb 0%, #e8e2dc 50%, #d4cec8 100%)",
     accent: "#2a2520",
     cover: "/images/between-castings.jpg",
+    gallery: ["/images/between-castings-natalie.png"],
     featured: false,
   },
   {

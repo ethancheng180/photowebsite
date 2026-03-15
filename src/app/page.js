@@ -651,12 +651,28 @@ function ProjectPage({ project, setPage }) {
 
         <FadeIn>
           <div className="project-images-grid" style={{ marginTop: 2 }}>
-            <div style={{ aspectRatio: "1/1", position: "relative", overflow: "hidden" }}>
-              <div style={{ position: "absolute", inset: 0, background: project.gradient }} />
-            </div>
-            <div style={{ aspectRatio: "1/1", position: "relative", overflow: "hidden" }}>
-              <div style={{ position: "absolute", inset: 0, background: project.gradient.replace("165deg", "130deg") }} />
-            </div>
+            {project.gallery && project.gallery.length > 0 ? (
+              project.gallery.slice(0, 2).map((src, i) => (
+                <div key={i} style={{ aspectRatio: "1/1", position: "relative", overflow: "hidden" }}>
+                  <Image
+                    src={src}
+                    alt={`${project.title} — ${i + 1}`}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    style={{ objectFit: "cover", objectPosition: "top center" }}
+                  />
+                </div>
+              ))
+            ) : (
+              <>
+                <div style={{ aspectRatio: "1/1", position: "relative", overflow: "hidden" }}>
+                  <div style={{ position: "absolute", inset: 0, background: project.gradient }} />
+                </div>
+                <div style={{ aspectRatio: "1/1", position: "relative", overflow: "hidden" }}>
+                  <div style={{ position: "absolute", inset: 0, background: project.gradient.replace("165deg", "130deg") }} />
+                </div>
+              </>
+            )}
           </div>
         </FadeIn>
 
