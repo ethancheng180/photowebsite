@@ -141,7 +141,7 @@ function HomePage({ setPage, setProject }) {
               fill
               priority
               sizes="100vw"
-              style={{ objectFit: "cover", objectPosition: "top center" }}
+              style={{ objectFit: "cover", objectPosition: "center 25%" }}
             />
           ) : (
             <div style={{ background: PROJECTS[0].gradient, position: "absolute", inset: 0 }} />
