@@ -203,8 +203,6 @@ body {
 .hero-bg {
   position: absolute;
   inset: 0;
-  background-size: cover;
-  background-position: center;
   transform: scale(1.05);
   animation: heroZoom 12s var(--ease-out-expo) forwards;
 }

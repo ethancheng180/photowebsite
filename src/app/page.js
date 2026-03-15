@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { PROJECTS, CATEGORIES, CLIENTS } from "@/data/projects";
 
 // ─── UTILITY: Intersection Observer Hook ────────────────────
@@ -132,7 +133,20 @@ function HomePage({ setPage, setProject }) {
   return (
     <div className="page-transition">
       <section className="hero">
-        <div className="hero-bg" style={bgStyle(PROJECTS[0])} />
+        <div className="hero-bg">
+          {PROJECTS[0].cover ? (
+            <Image
+              src={PROJECTS[0].cover}
+              alt={PROJECTS[0].title}
+              fill
+              priority
+              sizes="100vw"
+              style={{ objectFit: "cover", objectPosition: "top center" }}
+            />
+          ) : (
+            <div style={{ background: PROJECTS[0].gradient, position: "absolute", inset: 0 }} />
+          )}
+        </div>
         <div className="hero-overlay" />
         <div className="hero-content">
           <div className="hero-tagline">Fashion · Editorial · Campaign</div>
