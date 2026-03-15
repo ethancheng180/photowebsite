@@ -1,6 +1,6 @@
 import { getProjects } from "@/lib/sanity";
 import { PROJECTS as STATIC_PROJECTS } from "@/data/projects";
-import SiteClient from "./SiteClient";
+import SiteClient from "../SiteClient";
 
 export default async function Home() {
   let projects;
