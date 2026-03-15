@@ -109,6 +109,8 @@ body {
   gap: 5px;
   cursor: pointer;
   padding: 4px;
+  background: none;
+  border: none;
 }
 .nav-hamburger span {
   width: 24px;
@@ -508,9 +510,30 @@ body {
   grid-template-columns: 1fr 1fr;
   gap: 2px;
 }
+.project-text-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+}
+.about-text-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+}
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+}
 @media (max-width: 768px) {
   .project-images-grid {
     grid-template-columns: 1fr;
+  }
+  .project-text-grid,
+  .about-text-grid,
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: 48px;
   }
 }
 

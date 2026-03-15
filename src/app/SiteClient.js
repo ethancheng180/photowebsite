@@ -83,7 +83,7 @@ function Nav({ page, setPage }) {
   return (
     <>
       <nav className={`nav${scrolled ? " scrolled" : ""}`}>
-        <a className="nav-logo" onClick={() => go("home")}>
+        <a className="nav-logo" onClick={() => go("home")} role="button" tabIndex={0} aria-label="Go to homepage">
           Ethan Cheng
         </a>
         <ul className="nav-links">
@@ -97,14 +97,14 @@ function Nav({ page, setPage }) {
             </li>
           ))}
         </ul>
-        <div className="nav-hamburger" onClick={() => setMenuOpen(true)}>
+        <button className="nav-hamburger" onClick={() => setMenuOpen(true)} aria-label="Open menu">
           <span />
           <span />
           <span />
-        </div>
+        </button>
       </nav>
       <div className={`mobile-menu${menuOpen ? " open" : ""}`}>
-        <button className="mobile-menu-close" onClick={() => setMenuOpen(false)}>
+        <button className="mobile-menu-close" onClick={() => setMenuOpen(false)} aria-label="Close menu">
           ×
         </button>
         {[
@@ -500,7 +500,7 @@ function PortfolioPage({ projects, setPage, setProject }) {
 // ─── PROJECT PAGE ───────────────────────────────────────────
 function ProjectPage({ project, setPage }) {
   if (!project) return null;
-  const c = project.credits;
+  const c = project.credits || {};
   const creditEntries = [
     ["Photography", c.photographer],
     ["Model", c.model],
@@ -509,7 +509,7 @@ function ProjectPage({ project, setPage }) {
     ["Makeup", c.makeup],
     ["Creative Direction", c.creative],
     ["Casting", c.casting],
-  ];
+  ].filter(([, value]) => value && value !== "—");
 
   return (
     <div className="page-transition">
@@ -580,7 +580,7 @@ function ProjectPage({ project, setPage }) {
 
       <div style={{ maxWidth: 1400, margin: "0 auto", padding: "80px 40px" }}>
         <FadeIn>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, marginBottom: 80 }}>
+          <div className="project-text-grid" style={{ marginBottom: 80 }}>
             <p
               style={{
                 fontFamily: "var(--font-display)",
@@ -642,51 +642,53 @@ function ProjectPage({ project, setPage }) {
         <FadeIn>
           <div style={{ width: "100%", aspectRatio: "16/10", position: "relative", overflow: "hidden" }}>
             {project.cover ? (
-              <img src={project.cover} alt={project.title} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+              <Image
+                src={project.cover}
+                alt={project.title}
+                fill
+                sizes="100vw"
+                style={{ objectFit: "cover" }}
+              />
             ) : (
               <PlaceholderImage gradient={project.gradient} accent={project.accent} />
             )}
           </div>
         </FadeIn>
 
-        <FadeIn>
-          <div className="project-images-grid" style={{ marginTop: 2 }}>
-            {project.gallery && project.gallery.length > 0 ? (
-              project.gallery.slice(0, 2).map((src, i) => (
-                <div key={i} style={{ aspectRatio: "1/1", position: "relative", overflow: "hidden" }}>
+        {project.gallery && project.gallery.length > 0 ? (
+          project.gallery.map((src, i) => {
+            const isWide = i % 3 === 0;
+            return (
+              <FadeIn key={i}>
+                <div style={{
+                  width: isWide ? "100%" : undefined,
+                  maxWidth: isWide ? undefined : 600,
+                  margin: isWide ? undefined : "2px auto 0",
+                  aspectRatio: isWide ? "16/10" : "3/4",
+                  position: "relative",
+                  overflow: "hidden",
+                  marginTop: i === 0 ? 0 : 2,
+                }}>
                   <Image
                     src={src}
                     alt={`${project.title} — ${i + 1}`}
                     fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    sizes={isWide ? "100vw" : "(max-width: 768px) 100vw, 600px"}
                     style={{ objectFit: "cover", objectPosition: "top center" }}
                   />
                 </div>
-              ))
-            ) : (
-              <>
-                <div style={{ aspectRatio: "1/1", position: "relative", overflow: "hidden" }}>
-                  <div style={{ position: "absolute", inset: 0, background: project.gradient }} />
-                </div>
-                <div style={{ aspectRatio: "1/1", position: "relative", overflow: "hidden" }}>
-                  <div style={{ position: "absolute", inset: 0, background: (project.gradient || "").replace("165deg", "130deg") }} />
-                </div>
-              </>
-            )}
-          </div>
-        </FadeIn>
-
-        <FadeIn>
-          <div style={{ maxWidth: 600, margin: "2px auto 0", width: "100%" }}>
-            <div style={{ aspectRatio: "3/4", position: "relative", overflow: "hidden" }}>
-              {project.cover ? (
-                <img src={project.cover} alt={project.title} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "grayscale(30%)" }} />
-              ) : (
+              </FadeIn>
+            );
+          })
+        ) : (
+          <FadeIn>
+            <div style={{ maxWidth: 600, margin: "2px auto 0", width: "100%" }}>
+              <div style={{ aspectRatio: "3/4", position: "relative", overflow: "hidden" }}>
                 <PlaceholderImage gradient={project.gradient} accent={project.accent} />
-              )}
+              </div>
             </div>
-          </div>
-        </FadeIn>
+          </FadeIn>
+        )}
 
         <div style={{ marginTop: 80, paddingTop: 40, borderTop: "1px solid var(--c-border)" }}>
           <a
@@ -752,7 +754,7 @@ function AboutPage({ setPage }) {
       </div>
       <div style={{ maxWidth: 1400, margin: "0 auto", padding: "80px 40px" }}>
         <FadeIn>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80 }}>
+          <div className="about-text-grid">
             <div
               style={{
                 fontFamily: "var(--font-display)",
@@ -959,7 +961,7 @@ function ContactPage({ setPage }) {
         </div>
       </div>
       <div style={{ maxWidth: 1400, margin: "0 auto", padding: "80px 40px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80 }}>
+        <div className="contact-grid">
           <div>
             <FadeIn>
               {[
