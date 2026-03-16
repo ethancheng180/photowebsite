@@ -18,18 +18,15 @@ export default defineConfig({
     structureTool({
       structure: (S, context) =>
         S.list()
-          .title("Content")
+          .title("Portfolio")
           .items([
             orderableDocumentListDeskItem({
               type: "project",
-              title: "Projects (drag to reorder)",
+              title: "Projects",
+              icon: () => "◼",
               S,
               context,
             }),
-            S.divider(),
-            ...S.documentTypeListItems().filter(
-              (item) => item.getId() !== "project"
-            ),
           ]),
     }),
     visionTool({ defaultApiVersion: "2024-01-01" }),
