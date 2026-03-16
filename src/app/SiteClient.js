@@ -502,8 +502,12 @@ function HomePage({ projects, settings, setPage, setProject }) {
 }
 
 // ─── PORTFOLIO PAGE ─────────────────────────────────────────
-function PortfolioPage({ projects, setPage, setProject }) {
+function PortfolioPage({ projects, settings, setPage, setProject }) {
   const [filter, setFilter] = useState("All");
+  const cmsFilters = settings?.portfolioFilters;
+  const categories = cmsFilters && cmsFilters.length > 0
+    ? ["All", ...cmsFilters]
+    : CATEGORIES;
   const filtered = filter === "All" ? projects : projects.filter((p) => p.category === filter);
   const openProject = (p) => {
     setProject(p);
@@ -551,7 +555,7 @@ function PortfolioPage({ projects, setPage, setProject }) {
       </div>
       <div className="section">
         <div className="portfolio-filters">
-          {CATEGORIES.map((c) => (
+          {categories.map((c) => (
             <button
               key={c}
               className={`portfolio-filter${filter === c ? " active" : ""}`}
@@ -1366,7 +1370,7 @@ export default function SiteClient({ projects, settings }) {
       <div className="noise-overlay" />
       <Nav page={page} setPage={setPage} />
       {page === "home" && <HomePage projects={projects} settings={settings} setPage={setPage} setProject={setProject} />}
-      {page === "portfolio" && <PortfolioPage projects={projects} setPage={setPage} setProject={setProject} />}
+      {page === "portfolio" && <PortfolioPage projects={projects} settings={settings} setPage={setPage} setProject={setProject} />}
       {page === "project" && <ProjectPage project={project} setPage={setPage} />}
       {page === "about" && <AboutPage setPage={setPage} />}
       {page === "contact" && <ContactPage setPage={setPage} />}

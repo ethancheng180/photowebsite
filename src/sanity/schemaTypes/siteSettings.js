@@ -6,6 +6,7 @@ export default defineType({
   type: "document",
   groups: [
     { name: "hero", title: "Hero", default: true },
+    { name: "portfolio", title: "Portfolio" },
     { name: "quote", title: "Quote" },
     { name: "clients", title: "Clients" },
     { name: "feature", title: "Featured Article" },
@@ -39,6 +40,18 @@ export default defineType({
       description: "Supporting text below the headline.",
       initialValue:
         "Fashion photography rooted in editorial intelligence, visual discipline, and a deep respect for the craft of image-making.",
+    }),
+
+    // ─── PORTFOLIO FILTERS ─────────────────────────────
+    defineField({
+      name: "portfolioFilters",
+      title: "Portfolio Filter Tabs",
+      type: "array",
+      group: "portfolio",
+      description:
+        'Drag to reorder. Each entry becomes a filter tab on the Portfolio page. "All" is always shown first automatically — do not add it here. The names must exactly match the Category values you assign to projects.',
+      of: [{ type: "string" }],
+      initialValue: ["Editorial", "Campaign", "Beauty", "Portraits", "Celebrity"],
     }),
 
     // ─── QUOTE ───────────────────────────────────────

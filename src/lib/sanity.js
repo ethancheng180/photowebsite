@@ -25,6 +25,7 @@ export async function getSiteSettings() {
     heroTagline,
     heroTitle,
     heroSubtitle,
+    portfolioFilters,
     showQuote,
     quoteText,
     quoteAttribution,

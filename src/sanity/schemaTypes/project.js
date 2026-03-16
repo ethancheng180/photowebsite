@@ -41,19 +41,9 @@ export default defineType({
       title: "Category",
       type: "string",
       group: "essential",
-      description: "Determines which filter tab this project appears under in the Portfolio page.",
-      options: {
-        list: [
-          { title: "Editorial", value: "Editorial" },
-          { title: "Campaign", value: "Campaign" },
-          { title: "Beauty", value: "Beauty" },
-          { title: "Portraits", value: "Portraits" },
-          { title: "Celebrity", value: "Celebrity" },
-        ],
-        layout: "radio",
-        direction: "horizontal",
-      },
-      validation: (Rule) => Rule.required().error("Pick a category so the project appears in the right filter."),
+      description:
+        'Type the exact filter name from Site Settings → Portfolio tab. e.g. "Editorial", "Campaign", "Beauty". Must match exactly for the filter to work.',
+      validation: (Rule) => Rule.required().error("Enter a category so the project appears in the right filter."),
     }),
 
     defineField({
