@@ -20,6 +20,16 @@ export default defineConfig({
         S.list()
           .title("Portfolio")
           .items([
+            S.listItem()
+              .title("Site Settings")
+              .icon(() => "⚙")
+              .child(
+                S.document()
+                  .schemaType("siteSettings")
+                  .documentId("siteSettings")
+                  .title("Site Settings")
+              ),
+            S.divider(),
             orderableDocumentListDeskItem({
               type: "project",
               title: "Projects",

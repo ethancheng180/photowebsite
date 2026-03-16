@@ -145,14 +145,55 @@ function Nav({ page, setPage }) {
   );
 }
 
+// ─── DEFAULTS ───────────────────────────────────────────────
+const DEFAULTS = {
+  heroTagline: "Fashion · Editorial · Campaign",
+  heroTitle: "The image is the\nfirst conversation.",
+  heroSubtitle:
+    "Fashion photography rooted in editorial intelligence, visual discipline, and a deep respect for the craft of image-making.",
+  showQuote: true,
+  quoteText:
+    "I photograph the space between the performance and the person. That's where fashion becomes interesting.",
+  quoteAttribution: "Ethan Cheng",
+  showClients: true,
+  showFeature: true,
+  featureLabel: "Featured In",
+  featureTitle: "Flaunt Magazine",
+  featureIssue: "Issue 198 · Can't Let Go",
+  featureHeadline: "Lukas Gage — Nothing So Sweet As Humility",
+  featureDescription:
+    "Published in Flaunt Magazine. Photographed by Ollie Ali, styled by Christopher Campbell. Ethan Cheng — 2nd Assistant Photographer.",
+  featureCredits: [
+    { role: "Photographer", name: "Ollie Ali" },
+    { role: "Stylist", name: "Christopher Campbell" },
+    { role: "Grooming", name: "Nathaniel Dezan" },
+    { role: "2nd Assistant", name: "Ethan Cheng" },
+  ],
+  featureUrl: "https://www.flaunt.com/post/lukas-gage-cant-let-go-issue",
+  featureLinkText: "Read on Flaunt →",
+  showCta: true,
+  ctaLabel: "Inquiries",
+  ctaTitle: "Let's create something\nworth remembering.",
+  ctaBody:
+    "Available for editorial commissions, campaign work, beauty stories, and select brand collaborations worldwide.",
+  ctaButtonText: "Get in Touch",
+};
+
+function useSetting(settings, key) {
+  return settings?.[key] ?? DEFAULTS[key];
+}
+
 // ─── HOME PAGE ──────────────────────────────────────────────
-function HomePage({ projects, setPage, setProject }) {
+function HomePage({ projects, settings, setPage, setProject }) {
   const featured = projects.filter((p) => p.featured);
   const openProject = (p) => {
     setProject(p);
     setPage("project");
     window.scrollTo({ top: 0 });
   };
+
+  const s = (key) => useSetting(settings, key);
+  const heroTitleLines = (s("heroTitle") || "").split("\n");
 
   return (
     <div className="page-transition">
@@ -173,56 +214,54 @@ function HomePage({ projects, setPage, setProject }) {
         </div>
         <div className="hero-overlay" />
         <div className="hero-content">
-          <div className="hero-tagline">Fashion · Editorial · Campaign</div>
+          <div className="hero-tagline">{s("heroTagline")}</div>
           <h1 className="hero-title">
-            The image is the
-            <br />
-            first conversation.
+            {heroTitleLines.map((line, i) => (
+              <span key={i}>{line}{i < heroTitleLines.length - 1 && <br />}</span>
+            ))}
           </h1>
-          <p className="hero-subtitle">
-            Fashion photography rooted in editorial intelligence, visual discipline, and a deep
-            respect for the craft of image-making.
-          </p>
+          <p className="hero-subtitle">{s("heroSubtitle")}</p>
         </div>
         <div className="hero-scroll">Scroll</div>
       </section>
 
-      <section style={{ padding: "180px 40px", maxWidth: 860, margin: "0 auto", textAlign: "center" }}>
-        <FadeIn>
-          <p
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "clamp(26px, 3.5vw, 44px)",
-              fontWeight: 300,
-              lineHeight: 1.45,
-              color: "var(--c-fg)",
-              fontStyle: "italic",
-              letterSpacing: "-0.01em",
-            }}
-          >
-            "I photograph the space between the performance and the person. That's where fashion
-            becomes interesting."
-          </p>
-          <div style={{
-            width: 24,
-            height: 1,
-            background: "var(--c-border)",
-            margin: "36px auto 0",
-          }} />
-          <p
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: 9,
-              letterSpacing: "0.25em",
-              textTransform: "uppercase",
-              color: "var(--c-fg-tertiary)",
-              marginTop: 20,
-            }}
-          >
-            Ethan Cheng
-          </p>
-        </FadeIn>
-      </section>
+      {s("showQuote") && (
+        <section style={{ padding: "180px 40px", maxWidth: 860, margin: "0 auto", textAlign: "center" }}>
+          <FadeIn>
+            <p
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "clamp(26px, 3.5vw, 44px)",
+                fontWeight: 300,
+                lineHeight: 1.45,
+                color: "var(--c-fg)",
+                fontStyle: "italic",
+                letterSpacing: "-0.01em",
+              }}
+            >
+              "{s("quoteText")}"
+            </p>
+            <div style={{
+              width: 24,
+              height: 1,
+              background: "var(--c-border)",
+              margin: "36px auto 0",
+            }} />
+            <p
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: 9,
+                letterSpacing: "0.25em",
+                textTransform: "uppercase",
+                color: "var(--c-fg-tertiary)",
+                marginTop: 20,
+              }}
+            >
+              {s("quoteAttribution")}
+            </p>
+          </FadeIn>
+        </section>
+      )}
 
       <section className="section">
         <FadeIn>
@@ -267,199 +306,195 @@ function HomePage({ projects, setPage, setProject }) {
         </div>
       </section>
 
-      {/* EDITORIAL STRIP */}
-      <div style={{ padding: "0 40px", maxWidth: 1400, margin: "0 auto 120px" }}>
-        <FadeIn>
-          <div
-            style={{
-              borderTop: "1px solid var(--c-border)",
-              borderBottom: "1px solid var(--c-border)",
-              padding: "40px 0",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: 24,
-            }}
-          >
-            {CLIENTS.slice(0, 7).map((c) => (
-              <span
-                key={c}
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: 15,
-                  fontWeight: 400,
-                  color: "var(--c-fg-tertiary)",
-                  fontStyle: "italic",
-                  letterSpacing: "0.02em",
-                }}
-              >
-                {c}
-              </span>
-            ))}
-          </div>
-        </FadeIn>
-      </div>
-
-      {/* FEATURED IN */}
-      <section className="section" style={{ paddingBottom: 40 }}>
-        <FadeIn>
-          <div className="section-label">Featured In</div>
-          <h2 className="section-title">Flaunt Magazine</h2>
-          <div className="section-divider" />
-          <a
-            href="https://www.flaunt.com/post/lukas-gage-cant-let-go-issue"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: "block",
-              overflow: "hidden",
-              marginTop: 40,
-              cursor: "pointer",
-              textDecoration: "none",
-              color: "inherit",
-            }}
-          >
+      {s("showClients") && (
+        <div style={{ padding: "0 40px", maxWidth: 1400, margin: "0 auto 120px" }}>
+          <FadeIn>
             <div
               style={{
-                background: "var(--c-fg)",
-                padding: "48px 40px",
+                borderTop: "1px solid var(--c-border)",
+                borderBottom: "1px solid var(--c-border)",
+                padding: "40px 0",
                 display: "flex",
-                flexDirection: "column",
-                gap: 20,
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: 24,
+              }}
+            >
+              {(settings?.clients || CLIENTS).slice(0, 7).map((c) => (
+                <span
+                  key={c}
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    fontSize: 15,
+                    fontWeight: 400,
+                    color: "var(--c-fg-tertiary)",
+                    fontStyle: "italic",
+                    letterSpacing: "0.02em",
+                  }}
+                >
+                  {c}
+                </span>
+              ))}
+            </div>
+          </FadeIn>
+        </div>
+      )}
+
+      {s("showFeature") && (
+        <section className="section" style={{ paddingBottom: 40 }}>
+          <FadeIn>
+            <div className="section-label">{s("featureLabel")}</div>
+            <h2 className="section-title">{s("featureTitle")}</h2>
+            <div className="section-divider" />
+            <a
+              href={s("featureUrl")}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "block",
+                overflow: "hidden",
+                marginTop: 40,
+                cursor: "pointer",
+                textDecoration: "none",
+                color: "inherit",
               }}
             >
               <div
                 style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: 9,
-                  letterSpacing: "0.2em",
-                  textTransform: "uppercase",
-                  color: "rgba(250,249,247,0.4)",
+                  background: "var(--c-fg)",
+                  padding: "48px 40px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 20,
                 }}
               >
-                Issue 198 · Can't Let Go
-              </div>
-              <div
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: "clamp(24px, 3vw, 36px)",
-                  fontWeight: 300,
-                  color: "var(--c-bg)",
-                  lineHeight: 1.3,
-                }}
-              >
-                Lukas Gage — Nothing So Sweet As Humility
-              </div>
-              <div
-                style={{
-                  fontFamily: "var(--font-body)",
-                  fontSize: 13,
-                  color: "rgba(250,249,247,0.5)",
-                  lineHeight: 1.7,
-                  maxWidth: 560,
-                }}
-              >
-                Published in Flaunt Magazine. Photographed by Ollie Ali, styled by Christopher
-                Campbell. Ethan Cheng — 2nd Assistant Photographer.
-              </div>
-              <div style={{ display: "flex", gap: 32, marginTop: 8, flexWrap: "wrap" }}>
-                {[
-                  ["Photographer", "Ollie Ali"],
-                  ["Stylist", "Christopher Campbell"],
-                  ["Grooming", "Nathaniel Dezan"],
-                  ["2nd Assistant", "Ethan Cheng"],
-                ].map(([role, name]) => (
-                  <div key={role}>
-                    <div
-                      style={{
-                        fontFamily: "var(--font-mono)",
-                        fontSize: 8,
-                        letterSpacing: "0.15em",
-                        textTransform: "uppercase",
-                        color: "rgba(250,249,247,0.3)",
-                        marginBottom: 4,
-                      }}
-                    >
-                      {role}
+                <div
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: 9,
+                    letterSpacing: "0.2em",
+                    textTransform: "uppercase",
+                    color: "rgba(250,249,247,0.4)",
+                  }}
+                >
+                  {s("featureIssue")}
+                </div>
+                <div
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    fontSize: "clamp(24px, 3vw, 36px)",
+                    fontWeight: 300,
+                    color: "var(--c-bg)",
+                    lineHeight: 1.3,
+                  }}
+                >
+                  {s("featureHeadline")}
+                </div>
+                <div
+                  style={{
+                    fontFamily: "var(--font-body)",
+                    fontSize: 13,
+                    color: "rgba(250,249,247,0.5)",
+                    lineHeight: 1.7,
+                    maxWidth: 560,
+                  }}
+                >
+                  {s("featureDescription")}
+                </div>
+                <div style={{ display: "flex", gap: 32, marginTop: 8, flexWrap: "wrap" }}>
+                  {(settings?.featureCredits || DEFAULTS.featureCredits).map((c) => (
+                    <div key={c.role}>
+                      <div
+                        style={{
+                          fontFamily: "var(--font-mono)",
+                          fontSize: 8,
+                          letterSpacing: "0.15em",
+                          textTransform: "uppercase",
+                          color: "rgba(250,249,247,0.3)",
+                          marginBottom: 4,
+                        }}
+                      >
+                        {c.role}
+                      </div>
+                      <div
+                        style={{
+                          fontFamily: "var(--font-body)",
+                          fontSize: 12,
+                          color: "rgba(250,249,247,0.7)",
+                        }}
+                      >
+                        {c.name}
+                      </div>
                     </div>
-                    <div
-                      style={{
-                        fontFamily: "var(--font-body)",
-                        fontSize: 12,
-                        color: "rgba(250,249,247,0.7)",
-                      }}
-                    >
-                      {name}
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+                <div
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: 10,
+                    letterSpacing: "0.15em",
+                    textTransform: "uppercase",
+                    color: "var(--c-bg)",
+                    marginTop: 12,
+                    paddingBottom: 2,
+                    borderBottom: "1px solid rgba(250,249,247,0.3)",
+                    alignSelf: "flex-start",
+                  }}
+                >
+                  {s("featureLinkText")}
+                </div>
               </div>
-              <div
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: 10,
-                  letterSpacing: "0.15em",
-                  textTransform: "uppercase",
-                  color: "var(--c-bg)",
-                  marginTop: 12,
-                  paddingBottom: 2,
-                  borderBottom: "1px solid rgba(250,249,247,0.3)",
-                  alignSelf: "flex-start",
-                }}
-              >
-                Read on Flaunt →
-              </div>
-            </div>
-          </a>
-        </FadeIn>
-      </section>
+            </a>
+          </FadeIn>
+        </section>
+      )}
 
-      {/* CTA */}
-      <section className="section" style={{ paddingTop: 0 }}>
-        <FadeIn>
-          <div className="section-label">Inquiries</div>
-          <h2 className="section-title">
-            Let's create something
-            <br />
-            worth remembering.
-          </h2>
-          <div className="section-divider" />
-          <p
-            style={{
-              fontFamily: "var(--font-body)",
-              fontSize: 14,
-              color: "var(--c-fg-secondary)",
-              maxWidth: 480,
-              lineHeight: 1.8,
-            }}
-          >
-            Available for editorial commissions, campaign work, beauty stories, and select brand
-            collaborations worldwide.
-          </p>
-          <a
-            onClick={() => {
-              setPage("contact");
-              window.scrollTo({ top: 0 });
-            }}
-            style={{
-              display: "inline-block",
-              marginTop: 32,
-              fontFamily: "var(--font-mono)",
-              fontSize: 10,
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
-              color: "var(--c-fg)",
-              borderBottom: "1px solid var(--c-fg)",
-              paddingBottom: 4,
-              cursor: "pointer",
-              textDecoration: "none",
-            }}
-          >
-            Get in Touch
-          </a>
-        </FadeIn>
-      </section>
+      {s("showCta") && (
+        <section className="section" style={{ paddingTop: 0 }}>
+          <FadeIn>
+            <div className="section-label">{s("ctaLabel")}</div>
+            <h2 className="section-title">
+              {(s("ctaTitle") || "").split("\n").map((line, i, arr) => (
+                <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
+              ))}
+            </h2>
+            <div className="section-divider" />
+            <p
+              style={{
+                fontFamily: "var(--font-body)",
+                fontSize: 14,
+                color: "var(--c-fg-secondary)",
+                maxWidth: 480,
+                lineHeight: 1.8,
+              }}
+            >
+              {s("ctaBody")}
+            </p>
+            <a
+              onClick={() => {
+                setPage("contact");
+                window.scrollTo({ top: 0 });
+              }}
+              style={{
+                display: "inline-block",
+                marginTop: 32,
+                fontFamily: "var(--font-mono)",
+                fontSize: 10,
+                letterSpacing: "0.2em",
+                textTransform: "uppercase",
+                color: "var(--c-fg)",
+                borderBottom: "1px solid var(--c-fg)",
+                paddingBottom: 4,
+                cursor: "pointer",
+                textDecoration: "none",
+              }}
+            >
+              {s("ctaButtonText")}
+            </a>
+          </FadeIn>
+        </section>
+      )}
 
       <Footer setPage={setPage} />
     </div>
@@ -1322,7 +1357,7 @@ function Footer({ setPage }) {
 }
 
 // ─── APP ────────────────────────────────────────────────────
-export default function SiteClient({ projects }) {
+export default function SiteClient({ projects, settings }) {
   const [page, setPage] = useState("home");
   const [project, setProject] = useState(null);
 
@@ -1330,7 +1365,7 @@ export default function SiteClient({ projects }) {
     <>
       <div className="noise-overlay" />
       <Nav page={page} setPage={setPage} />
-      {page === "home" && <HomePage projects={projects} setPage={setPage} setProject={setProject} />}
+      {page === "home" && <HomePage projects={projects} settings={settings} setPage={setPage} setProject={setProject} />}
       {page === "portfolio" && <PortfolioPage projects={projects} setPage={setPage} setProject={setProject} />}
       {page === "project" && <ProjectPage project={project} setPage={setPage} />}
       {page === "about" && <AboutPage setPage={setPage} />}

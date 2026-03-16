@@ -18,9 +18,37 @@ export function urlFor(source) {
   return builder.image(source);
 }
 
-// Fetches all projects ordered by drag-and-drop rank.
-// Returns data shaped to match the existing PROJECTS array contract.
-// Returns empty array if Sanity is not configured.
+export async function getSiteSettings() {
+  if (!client) return null;
+
+  const query = `*[_type == "siteSettings"][0] {
+    heroTagline,
+    heroTitle,
+    heroSubtitle,
+    showQuote,
+    quoteText,
+    quoteAttribution,
+    showClients,
+    clients,
+    showFeature,
+    featureLabel,
+    featureTitle,
+    featureIssue,
+    featureHeadline,
+    featureDescription,
+    featureCredits,
+    featureUrl,
+    featureLinkText,
+    showCta,
+    ctaLabel,
+    ctaTitle,
+    ctaBody,
+    ctaButtonText
+  }`;
+
+  return client.fetch(query);
+}
+
 export async function getProjects() {
   if (!client) return [];
 
