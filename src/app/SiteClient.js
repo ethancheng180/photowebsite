@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { CATEGORIES, CLIENTS } from "@/data/projects";
 
@@ -17,7 +17,7 @@ function useFadeIn() {
           obs.unobserve(el);
         }
       },
-      { threshold: 0.15 }
+      { threshold: 0.12 }
     );
     obs.observe(el);
     return () => obs.disconnect();
@@ -34,33 +34,57 @@ function FadeIn({ children, className = "", style = {} }) {
   );
 }
 
-// ─── IMAGE PLACEHOLDER ──────────────────────────────────────
-function PlaceholderImage({ gradient, accent }) {
+// ─── IMAGE SYSTEM ───────────────────────────────────────────
+function EditorialPlaceholder({ label = "Image Coming Soon" }) {
   return (
-    <div
-      style={{
-        background: gradient,
-        position: "absolute",
-        inset: 0,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" style={{ opacity: 0.15 }}>
-        <circle cx="16" cy="16" r="14" stroke={accent || "#fff"} strokeWidth="0.5" />
-        <circle cx="16" cy="16" r="4" stroke={accent || "#fff"} strokeWidth="0.5" />
-        <line x1="16" y1="2" x2="16" y2="12" stroke={accent || "#fff"} strokeWidth="0.3" />
-        <line x1="16" y1="20" x2="16" y2="30" stroke={accent || "#fff"} strokeWidth="0.3" />
-      </svg>
+    <div className="editorial-placeholder">
+      <span className="editorial-placeholder-label">{label}</span>
     </div>
   );
 }
 
-function bgStyle(project) {
-  return project.cover
-    ? { background: `url(${project.cover}) center/cover no-repeat` }
-    : { background: project.gradient };
+function RevealImage({ src, alt, fill, sizes, style, priority, className = "" }) {
+  const [loaded, setLoaded] = useState(false);
+  const onLoad = useCallback(() => setLoaded(true), []);
+
+  if (!src) return <EditorialPlaceholder />;
+
+  return (
+    <Image
+      src={src}
+      alt={alt || ""}
+      fill={fill}
+      sizes={sizes}
+      priority={priority}
+      className={`image-reveal ${loaded ? "loaded" : ""} ${className}`}
+      style={style}
+      onLoad={onLoad}
+    />
+  );
+}
+
+function buildGalleryBlocks(gallery) {
+  const blocks = [];
+  let i = 0;
+  while (i < gallery.length) {
+    const pos = blocks.length % 3;
+    if (pos === 0) {
+      blocks.push({ type: "full", images: [gallery[i]], start: i });
+      i++;
+    } else if (pos === 1) {
+      if (i + 1 < gallery.length) {
+        blocks.push({ type: "pair", images: [gallery[i], gallery[i + 1]], start: i });
+        i += 2;
+      } else {
+        blocks.push({ type: "portrait", images: [gallery[i]], start: i });
+        i++;
+      }
+    } else {
+      blocks.push({ type: "portrait", images: [gallery[i]], start: i });
+      i++;
+    }
+  }
+  return blocks;
 }
 
 // ─── NAVIGATION ─────────────────────────────────────────────
@@ -163,29 +187,36 @@ function HomePage({ projects, setPage, setProject }) {
         <div className="hero-scroll">Scroll</div>
       </section>
 
-      <section style={{ padding: "160px 40px", maxWidth: 900, margin: "0 auto", textAlign: "center" }}>
+      <section style={{ padding: "180px 40px", maxWidth: 860, margin: "0 auto", textAlign: "center" }}>
         <FadeIn>
           <p
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(24px, 3.5vw, 42px)",
+              fontSize: "clamp(26px, 3.5vw, 44px)",
               fontWeight: 300,
-              lineHeight: 1.5,
+              lineHeight: 1.45,
               color: "var(--c-fg)",
               fontStyle: "italic",
+              letterSpacing: "-0.01em",
             }}
           >
             "I photograph the space between the performance and the person. That's where fashion
             becomes interesting."
           </p>
+          <div style={{
+            width: 24,
+            height: 1,
+            background: "var(--c-border)",
+            margin: "36px auto 0",
+          }} />
           <p
             style={{
               fontFamily: "var(--font-mono)",
-              fontSize: 10,
-              letterSpacing: "0.2em",
+              fontSize: 9,
+              letterSpacing: "0.25em",
               textTransform: "uppercase",
               color: "var(--c-fg-tertiary)",
-              marginTop: 32,
+              marginTop: 20,
             }}
           >
             Ethan Cheng
@@ -208,7 +239,21 @@ function HomePage({ projects, setPage, setProject }) {
               className={`featured-item${i === 0 ? " wide" : ""}`}
               onClick={() => openProject(p)}
             >
-              <div className="featured-item-bg" style={bgStyle(p)} />
+              <div className="featured-item-bg">
+                {p.cover ? (
+                  <RevealImage
+                    src={p.cover}
+                    alt={p.title}
+                    fill
+                    sizes={i === 0 ? "100vw" : "(max-width: 768px) 100vw, 50vw"}
+                    style={{ objectFit: "cover" }}
+                  />
+                ) : p.gradient ? (
+                  <div style={{ position: "absolute", inset: 0, background: p.gradient }} />
+                ) : (
+                  <EditorialPlaceholder />
+                )}
+              </div>
               <div className="featured-item-overlay" />
               <div className="featured-item-content">
                 <div className="featured-item-cat">
@@ -435,31 +480,34 @@ function PortfolioPage({ projects, setPage, setProject }) {
     <div className="page-transition">
       <div
         style={{
-          height: "40vh",
-          minHeight: 300,
+          height: "45vh",
+          minHeight: 340,
           display: "flex",
           alignItems: "flex-end",
           background: "var(--c-fg)",
-          padding: "0 40px 48px",
+          padding: "0 40px 56px",
         }}
       >
         <div style={{ maxWidth: 1400, margin: "0 auto", width: "100%" }}>
           <h1
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(36px, 5vw, 64px)",
+              fontSize: "clamp(40px, 5.5vw, 72px)",
               fontWeight: 300,
               color: "var(--c-bg)",
+              letterSpacing: "-0.015em",
             }}
           >
             Portfolio
           </h1>
           <p
             style={{
-              fontFamily: "var(--font-body)",
-              fontSize: 13,
-              color: "rgba(250,249,247,0.4)",
-              marginTop: 12,
+              fontFamily: "var(--font-mono)",
+              fontSize: 9,
+              letterSpacing: "0.2em",
+              textTransform: "uppercase",
+              color: "rgba(250,249,247,0.35)",
+              marginTop: 16,
             }}
           >
             Selected editorial, campaign, and personal work — 2024–2026
@@ -481,7 +529,21 @@ function PortfolioPage({ projects, setPage, setProject }) {
         <div className="portfolio-grid">
           {filtered.map((p) => (
             <div key={p.id} className="portfolio-card" onClick={() => openProject(p)}>
-              <div className="portfolio-card-bg" style={bgStyle(p)} />
+              <div className="portfolio-card-bg">
+                {p.cover ? (
+                  <RevealImage
+                    src={p.cover}
+                    alt={p.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    style={{ objectFit: "cover" }}
+                  />
+                ) : p.gradient ? (
+                  <div style={{ position: "absolute", inset: 0, background: p.gradient }} />
+                ) : (
+                  <EditorialPlaceholder />
+                )}
+              </div>
               <div className="portfolio-card-info">
                 <div className="portfolio-card-title">{p.title}</div>
                 <div className="portfolio-card-meta">
@@ -523,7 +585,22 @@ function ProjectPage({ project, setPage }) {
           overflow: "hidden",
         }}
       >
-        <div style={{ position: "absolute", inset: 0, ...bgStyle(project), backgroundSize: "cover", backgroundPosition: "center" }} />
+        <div style={{ position: "absolute", inset: 0 }}>
+          {project.cover ? (
+            <RevealImage
+              src={project.cover}
+              alt={project.title}
+              fill
+              priority
+              sizes="100vw"
+              style={{ objectFit: "cover" }}
+            />
+          ) : project.gradient ? (
+            <div style={{ position: "absolute", inset: 0, background: project.gradient }} />
+          ) : (
+            <EditorialPlaceholder label="Editorial In Progress" />
+          )}
+        </div>
         <div
           style={{
             position: "absolute",
@@ -640,9 +717,9 @@ function ProjectPage({ project, setPage }) {
 
         {/* Editorial image layout */}
         <FadeIn>
-          <div style={{ width: "100%", aspectRatio: "16/10", position: "relative", overflow: "hidden" }}>
+          <div className="image-container" style={{ width: "100%", aspectRatio: "3/2" }}>
             {project.cover ? (
-              <Image
+              <RevealImage
                 src={project.cover}
                 alt={project.title}
                 fill
@@ -650,47 +727,96 @@ function ProjectPage({ project, setPage }) {
                 style={{ objectFit: "cover" }}
               />
             ) : (
-              <PlaceholderImage gradient={project.gradient} accent={project.accent} />
+              <EditorialPlaceholder label="Lead Image" />
             )}
           </div>
         </FadeIn>
 
         {project.gallery && project.gallery.length > 0 ? (
-          project.gallery.map((src, i) => {
-            const isWide = i % 3 === 0;
-            return (
-              <FadeIn key={i}>
-                <div style={{
-                  width: isWide ? "100%" : undefined,
-                  maxWidth: isWide ? undefined : 600,
-                  margin: isWide ? undefined : "2px auto 0",
-                  aspectRatio: isWide ? "16/10" : "3/4",
-                  position: "relative",
-                  overflow: "hidden",
-                  marginTop: i === 0 ? 0 : 2,
-                }}>
-                  <Image
-                    src={src}
-                    alt={`${project.title} — ${i + 1}`}
-                    fill
-                    sizes={isWide ? "100vw" : "(max-width: 768px) 100vw, 600px"}
-                    style={{ objectFit: "cover", objectPosition: "top center" }}
-                  />
-                </div>
-              </FadeIn>
-            );
-          })
+          <div className="gallery-sequence">
+            {buildGalleryBlocks(project.gallery).map((block, bi) => {
+              if (block.type === "full") {
+                return (
+                  <FadeIn key={bi}>
+                    <div className="image-container" style={{ width: "100%", aspectRatio: "3/2" }}>
+                      <RevealImage
+                        src={block.images[0]}
+                        alt={`${project.title} — ${block.start + 1}`}
+                        fill
+                        sizes="100vw"
+                        style={{ objectFit: "cover" }}
+                      />
+                    </div>
+                  </FadeIn>
+                );
+              }
+              if (block.type === "pair") {
+                return (
+                  <FadeIn key={bi}>
+                    <div className="project-images-grid">
+                      {block.images.map((src, i) => (
+                        <div key={i} className="image-container" style={{ aspectRatio: "4/5" }}>
+                          <RevealImage
+                            src={src}
+                            alt={`${project.title} — ${block.start + i + 1}`}
+                            fill
+                            sizes="(max-width: 768px) 100vw, 50vw"
+                            style={{ objectFit: "cover" }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </FadeIn>
+                );
+              }
+              return (
+                <FadeIn key={bi}>
+                  <div style={{ maxWidth: 560, margin: "0 auto", width: "100%" }}>
+                    <div className="image-container" style={{ aspectRatio: "2/3" }}>
+                      <RevealImage
+                        src={block.images[0]}
+                        alt={`${project.title} — ${block.start + 1}`}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 560px"
+                        style={{ objectFit: "cover" }}
+                      />
+                    </div>
+                  </div>
+                </FadeIn>
+              );
+            })}
+          </div>
         ) : (
           <FadeIn>
-            <div style={{ maxWidth: 600, margin: "2px auto 0", width: "100%" }}>
-              <div style={{ aspectRatio: "3/4", position: "relative", overflow: "hidden" }}>
-                <PlaceholderImage gradient={project.gradient} accent={project.accent} />
+            <div style={{ maxWidth: 560, margin: "0 auto", width: "100%" }}>
+              <div className="image-container" style={{ aspectRatio: "2/3" }}>
+                <EditorialPlaceholder label="Gallery In Progress" />
               </div>
             </div>
           </FadeIn>
         )}
 
-        <div style={{ marginTop: 80, paddingTop: 40, borderTop: "1px solid var(--c-border)" }}>
+        <FadeIn>
+          <div style={{ textAlign: "center", padding: "80px 0 40px" }}>
+            <div style={{
+              width: 32,
+              height: 1,
+              background: "var(--c-border)",
+              margin: "0 auto 20px",
+            }} />
+            <div style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: 8,
+              letterSpacing: "0.25em",
+              textTransform: "uppercase",
+              color: "var(--c-warm)",
+            }}>
+              {project.title} · {project.year}
+            </div>
+          </div>
+        </FadeIn>
+
+        <div style={{ paddingTop: 40, borderTop: "1px solid var(--c-border)" }}>
           <a
             onClick={() => {
               setPage("portfolio");
@@ -732,20 +858,23 @@ function AboutPage({ setPage }) {
           <h1
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(40px, 6vw, 80px)",
+              fontSize: "clamp(44px, 6.5vw, 88px)",
               fontWeight: 300,
               color: "var(--c-bg)",
-              lineHeight: 1.1,
+              lineHeight: 1.05,
+              letterSpacing: "-0.015em",
             }}
           >
             Ethan Cheng
           </h1>
           <p
             style={{
-              fontFamily: "var(--font-body)",
-              fontSize: 13,
-              color: "rgba(250,249,247,0.4)",
-              marginTop: 16,
+              fontFamily: "var(--font-mono)",
+              fontSize: 9,
+              letterSpacing: "0.2em",
+              textTransform: "uppercase",
+              color: "rgba(250,249,247,0.35)",
+              marginTop: 20,
             }}
           >
             Fashion & Editorial Photographer — Los Angeles
@@ -944,16 +1073,17 @@ function ContactPage({ setPage }) {
           display: "flex",
           alignItems: "flex-end",
           background: "var(--c-fg)",
-          padding: "0 40px 48px",
+          padding: "0 40px 56px",
         }}
       >
         <div style={{ maxWidth: 1400, margin: "0 auto", width: "100%" }}>
           <h1
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(36px, 5vw, 64px)",
+              fontSize: "clamp(40px, 5.5vw, 72px)",
               fontWeight: 300,
               color: "var(--c-bg)",
+              letterSpacing: "-0.015em",
             }}
           >
             Inquiries
