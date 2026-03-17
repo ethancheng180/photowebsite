@@ -20,6 +20,7 @@ export default defineConfig({
         S.list()
           .title("Portfolio")
           .items([
+            // ─── Singleton: Site Settings ──────────────
             S.listItem()
               .title("Site Settings")
               .icon(() => "⚙")
@@ -29,7 +30,41 @@ export default defineConfig({
                   .documentId("siteSettings")
                   .title("Site Settings")
               ),
+
+            // ─── Singleton: Portfolio Page ─────────────
+            S.listItem()
+              .title("Portfolio Page")
+              .icon(() => "◻")
+              .child(
+                S.document()
+                  .schemaType("portfolioPage")
+                  .documentId("portfolioPage")
+                  .title("Portfolio Page Settings")
+              ),
+
             S.divider(),
+
+            // ─── Orderable: Navigation ─────────────────
+            orderableDocumentListDeskItem({
+              type: "navigationItem",
+              title: "Navigation",
+              icon: () => "☰",
+              S,
+              context,
+            }),
+
+            // ─── Orderable: Categories ─────────────────
+            orderableDocumentListDeskItem({
+              type: "category",
+              title: "Categories",
+              icon: () => "▦",
+              S,
+              context,
+            }),
+
+            S.divider(),
+
+            // ─── Orderable: Projects ───────────────────
             orderableDocumentListDeskItem({
               type: "project",
               title: "Projects",

@@ -39,11 +39,24 @@ export default defineType({
     defineField({
       name: "category",
       title: "Category",
-      type: "string",
+      type: "reference",
+      to: [{ type: "category" }],
       group: "essential",
       description:
-        'Type the exact filter name from Site Settings → Portfolio tab. e.g. "Editorial", "Campaign", "Beauty". Must match exactly for the filter to work.',
-      validation: (Rule) => Rule.required().error("Enter a category so the project appears in the right filter."),
+        "Select a category. Manage categories under the Categories section in the sidebar.",
+      validation: (Rule) =>
+        Rule.required().error(
+          "Select a category so the project appears in the right filter."
+        ),
+    }),
+
+    defineField({
+      name: "categoryFallback",
+      title: "Category (legacy)",
+      type: "string",
+      group: "essential",
+      hidden: true,
+      description: "Legacy string category — migrated to reference.",
     }),
 
     defineField({
