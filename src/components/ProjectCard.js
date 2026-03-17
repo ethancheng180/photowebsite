@@ -1,12 +1,13 @@
+import Link from "next/link";
 import ProjectImage, { EditorialPlaceholder } from "./ProjectImage";
 
-export default function ProjectCard({ project, index, onClick, variant = "default" }) {
+export default function ProjectCard({ project, index, variant = "default" }) {
   const isWide = variant === "featured-lead";
 
   return (
-    <div
+    <Link
+      href={`/portfolio/${project.id}`}
       className={`project-card ${variant === "featured-lead" ? "project-card--lead" : ""}`}
-      onClick={onClick}
       style={{ animationDelay: `${index * 60}ms` }}
     >
       <div className="project-card__image">
@@ -34,6 +35,6 @@ export default function ProjectCard({ project, index, onClick, variant = "defaul
         <div className="project-card__title">{project.title}</div>
         <div className="project-card__pub">{project.publication}</div>
       </div>
-    </div>
+    </Link>
   );
 }

@@ -5,7 +5,10 @@ import {
   CATEGORIES_QUERY,
   PORTFOLIO_PAGE_QUERY,
   PROJECTS_QUERY,
+  PROJECT_BY_SLUG_QUERY,
   SITE_SETTINGS_QUERY,
+  ABOUT_PAGE_QUERY,
+  CONTACT_PAGE_QUERY,
 } from "./queries";
 
 export const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
@@ -23,6 +26,18 @@ const builder = client ? createImageUrlBuilder(client) : null;
 export function urlFor(source) {
   if (!builder) return null;
   return builder.image(source);
+}
+
+function processProjectImages(p) {
+  return {
+    ...p,
+    cover: p.cover
+      ? urlFor(p.cover).width(1800).auto("format").quality(80).url()
+      : null,
+    gallery: (p.gallery || []).map((img) =>
+      urlFor(img).width(1400).auto("format").quality(82).url()
+    ),
+  };
 }
 
 export async function getNavigation() {
@@ -48,13 +63,22 @@ export async function getSiteSettings() {
 export async function getProjects() {
   if (!client) return [];
   const raw = await client.fetch(PROJECTS_QUERY);
-  return raw.map((p) => ({
-    ...p,
-    cover: p.cover
-      ? urlFor(p.cover).width(1800).auto("format").quality(80).url()
-      : null,
-    gallery: (p.gallery || []).map((img) =>
-      urlFor(img).width(1200).auto("format").quality(80).url()
-    ),
-  }));
+  return raw.map(processProjectImages);
+}
+
+export async function getProject(slug) {
+  if (!client) return null;
+  const raw = await client.fetch(PROJECT_BY_SLUG_QUERY, { slug });
+  if (!raw) return null;
+  return processProjectImages(raw);
+}
+
+export async function getAboutPage() {
+  if (!client) return null;
+  return client.fetch(ABOUT_PAGE_QUERY);
+}
+
+export async function getContactPage() {
+  if (!client) return null;
+  return client.fetch(CONTACT_PAGE_QUERY);
 }

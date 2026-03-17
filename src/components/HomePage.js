@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import FadeIn from "./FadeIn";
 import ProjectImage, { EditorialPlaceholder } from "./ProjectImage";
 import { CLIENTS as FALLBACK_CLIENTS } from "@/data/projects";
@@ -96,7 +97,7 @@ function QuoteSection({ settings }) {
   );
 }
 
-function FeaturedGrid({ projects, onSelect }) {
+function FeaturedGrid({ projects }) {
   const featured = projects.filter((p) => p.featured);
   if (featured.length === 0) return null;
 
@@ -111,10 +112,10 @@ function FeaturedGrid({ projects, onSelect }) {
       </FadeIn>
       <div className="featured-grid">
         {featured.map((p, i) => (
-          <div
+          <Link
             key={p.id}
+            href={`/portfolio/${p.id}`}
             className={`featured-item${i === 0 ? " wide" : ""}`}
-            onClick={() => onSelect(p)}
           >
             <div className="featured-item-bg">
               {p.cover ? (
@@ -141,7 +142,7 @@ function FeaturedGrid({ projects, onSelect }) {
               <div className="featured-item-title">{p.title}</div>
               <div className="featured-item-pub">{p.publication}</div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </section>
@@ -209,7 +210,7 @@ function FeatureSection({ settings }) {
   );
 }
 
-function CtaSection({ settings, setPage }) {
+function CtaSection({ settings }) {
   if (!s(settings, "showCta")) return null;
 
   return (
@@ -226,35 +227,23 @@ function CtaSection({ settings, setPage }) {
         </h2>
         <div className="section-divider" />
         <p className="cta-body">{s(settings, "ctaBody")}</p>
-        <a
-          onClick={() => {
-            setPage("contact");
-            window.scrollTo({ top: 0 });
-          }}
-          className="cta-link"
-        >
+        <Link href="/contact" className="cta-link">
           {s(settings, "ctaButtonText")}
-        </a>
+        </Link>
       </FadeIn>
     </section>
   );
 }
 
-export default function HomePage({ projects, settings, setPage, setProject }) {
-  const openProject = (p) => {
-    setProject(p);
-    setPage("project");
-    window.scrollTo({ top: 0 });
-  };
-
+export default function HomePage({ projects, settings }) {
   return (
     <div className="page-transition">
       <HeroSection project={projects[0]} settings={settings} />
       <QuoteSection settings={settings} />
-      <FeaturedGrid projects={projects} onSelect={openProject} />
+      <FeaturedGrid projects={projects} />
       <ClientsStrip settings={settings} />
       <FeatureSection settings={settings} />
-      <CtaSection settings={settings} setPage={setPage} />
+      <CtaSection settings={settings} />
     </div>
   );
 }

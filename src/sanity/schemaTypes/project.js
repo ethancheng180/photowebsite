@@ -202,13 +202,13 @@ export default defineType({
     select: {
       title: "title",
       publication: "publication",
-      category: "category",
+      categoryTitle: "category.title",
       year: "year",
       featured: "featured",
       media: "cover",
     },
-    prepare({ title, publication, category, year, featured, media }) {
-      const parts = [category, year].filter(Boolean).join(" · ");
+    prepare({ title, publication, categoryTitle, year, featured, media }) {
+      const parts = [categoryTitle, year].filter(Boolean).join(" · ");
       const subtitle = [publication, parts].filter(Boolean).join(" — ");
       return {
         title: `${featured ? "★ " : ""}${title}`,

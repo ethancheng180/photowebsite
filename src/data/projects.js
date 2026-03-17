@@ -210,15 +210,6 @@ export const PROJECTS = [
   },
 ];
 
-export const CATEGORIES = [
-  "All",
-  "Editorial",
-  "Campaign",
-  "Beauty",
-  "Portraits",
-  "Celebrity",
-];
-
 export const CLIENTS = [
   "Vogue France",
   "Vogue Italia",

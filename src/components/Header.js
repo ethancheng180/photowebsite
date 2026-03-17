@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 const DEFAULT_NAV = [
   { label: "Portfolio", page: "portfolio" },
@@ -8,11 +10,13 @@ const DEFAULT_NAV = [
   { label: "Contact", page: "contact" },
 ];
 
-export default function Header({ page, setPage, navigation }) {
+export default function Header({ navigation, settings }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   const items = navigation && navigation.length > 0 ? navigation : DEFAULT_NAV;
+  const siteName = settings?.siteName || "Ethan Cheng";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -20,28 +24,35 @@ export default function Header({ page, setPage, navigation }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const go = (p) => {
-    setPage(p);
+  useEffect(() => {
     setMenuOpen(false);
-    window.scrollTo({ top: 0 });
+  }, [pathname]);
+
+  const hrefFor = (page) => {
+    if (page === "home") return "/";
+    return `/${page}`;
+  };
+
+  const isActive = (page) => {
+    if (page === "portfolio") return pathname.startsWith("/portfolio");
+    return pathname === `/${page}`;
   };
 
   return (
     <>
       <nav className={`nav${scrolled ? " scrolled" : ""}`}>
-        <a
-          className="nav-logo"
-          onClick={() => go("home")}
-          role="button"
-          tabIndex={0}
-          aria-label="Go to homepage"
-        >
-          Ethan Cheng
-        </a>
+        <Link href="/" className="nav-logo" aria-label="Go to homepage">
+          {siteName}
+        </Link>
         <ul className="nav-links">
           {items.map((item) => (
             <li key={item.page}>
-              <a onClick={() => go(item.page)}>{item.label}</a>
+              <Link
+                href={hrefFor(item.page)}
+                className={isActive(item.page) ? "active" : ""}
+              >
+                {item.label}
+              </Link>
             </li>
           ))}
         </ul>
@@ -56,7 +67,11 @@ export default function Header({ page, setPage, navigation }) {
         </button>
       </nav>
 
-      <div className={`mobile-menu${menuOpen ? " open" : ""}`}>
+      <div
+        className={`mobile-menu${menuOpen ? " open" : ""}`}
+        role="dialog"
+        aria-modal="true"
+      >
         <button
           className="mobile-menu-close"
           onClick={() => setMenuOpen(false)}
@@ -65,9 +80,9 @@ export default function Header({ page, setPage, navigation }) {
           ×
         </button>
         {items.map((item) => (
-          <a key={item.page} onClick={() => go(item.page)}>
+          <Link key={item.page} href={hrefFor(item.page)}>
             {item.label}
-          </a>
+          </Link>
         ))}
       </div>
     </>

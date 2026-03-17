@@ -46,7 +46,13 @@ export default defineType({
       type: "string",
       group: "display",
       description:
-        'Category selected by default when the page loads. Leave empty for "All".',
+        'Category selected by default when the page loads. Must match a category title exactly, or leave empty for "All".',
+      validation: (Rule) =>
+        Rule.custom((val) => {
+          if (!val) return true;
+          if (val === "All") return true;
+          return typeof val === "string" ? true : "Must be a category name.";
+        }),
     }),
 
     defineField({

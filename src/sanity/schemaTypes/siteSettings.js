@@ -5,21 +5,81 @@ export default defineType({
   title: "Site Settings",
   type: "document",
   groups: [
-    { name: "hero", title: "Hero", default: true },
-    { name: "portfolio", title: "Portfolio" },
+    { name: "identity", title: "Identity", default: true },
+    { name: "hero", title: "Hero" },
     { name: "quote", title: "Quote" },
     { name: "clients", title: "Clients" },
     { name: "feature", title: "Featured Article" },
     { name: "cta", title: "Call to Action" },
   ],
   fields: [
+    // ─── IDENTITY ─────────────────────────────────────
+    defineField({
+      name: "siteName",
+      title: "Site Name",
+      type: "string",
+      group: "identity",
+      description: "Shown in the navigation bar and footer.",
+      initialValue: "Ethan Cheng",
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: "socialLinks",
+      title: "Social Links",
+      type: "array",
+      group: "identity",
+      of: [
+        {
+          type: "object",
+          fields: [
+            defineField({
+              name: "platform",
+              title: "Platform",
+              type: "string",
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: "url",
+              title: "URL",
+              type: "url",
+              validation: (Rule) =>
+                Rule.required().uri({ allowRelative: false, scheme: ["http", "https"] }),
+            }),
+            defineField({
+              name: "label",
+              title: "Display Label",
+              type: "string",
+              description: "Text shown on the site. Defaults to platform name.",
+            }),
+          ],
+          preview: {
+            select: { title: "platform", subtitle: "label" },
+          },
+        },
+      ],
+    }),
+    defineField({
+      name: "footerLocations",
+      title: "Footer Locations",
+      type: "string",
+      group: "identity",
+      initialValue: "Los Angeles · New York · Paris · Milan",
+    }),
+    defineField({
+      name: "footerCopyright",
+      title: "Footer Copyright",
+      type: "string",
+      group: "identity",
+      description: "Use {year} for the current year.",
+      initialValue: "© {year} Ethan Cheng. All rights reserved.",
+    }),
+
     // ─── HERO ────────────────────────────────────────
     defineField({
       name: "heroTagline",
       title: "Hero Tagline",
       type: "string",
       group: "hero",
-      description: "Small text above the headline. e.g. \"Fashion · Editorial · Campaign\"",
       initialValue: "Fashion · Editorial · Campaign",
     }),
     defineField({
@@ -28,7 +88,6 @@ export default defineType({
       type: "text",
       group: "hero",
       rows: 2,
-      description: "The large headline on the homepage hero. Use a line break for two lines.",
       initialValue: "The image is the\nfirst conversation.",
     }),
     defineField({
@@ -37,21 +96,8 @@ export default defineType({
       type: "text",
       group: "hero",
       rows: 2,
-      description: "Supporting text below the headline.",
       initialValue:
         "Fashion photography rooted in editorial intelligence, visual discipline, and a deep respect for the craft of image-making.",
-    }),
-
-    // ─── PORTFOLIO FILTERS ─────────────────────────────
-    defineField({
-      name: "portfolioFilters",
-      title: "Portfolio Filter Tabs",
-      type: "array",
-      group: "portfolio",
-      description:
-        'Drag to reorder. Each entry becomes a filter tab on the Portfolio page. "All" is always shown first automatically — do not add it here. The names must exactly match the Category values you assign to projects.',
-      of: [{ type: "string" }],
-      initialValue: ["Editorial", "Campaign", "Beauty", "Portraits", "Celebrity"],
     }),
 
     // ─── QUOTE ───────────────────────────────────────
@@ -60,7 +106,6 @@ export default defineType({
       title: "Show Quote Section",
       type: "boolean",
       group: "quote",
-      description: "Toggle the editorial quote section on or off.",
       initialValue: true,
     }),
     defineField({
@@ -69,7 +114,6 @@ export default defineType({
       type: "text",
       group: "quote",
       rows: 3,
-      description: "The pull quote displayed below the hero.",
       initialValue:
         "I photograph the space between the performance and the person. That's where fashion becomes interesting.",
     }),
@@ -78,7 +122,6 @@ export default defineType({
       title: "Attribution",
       type: "string",
       group: "quote",
-      description: "Who said it.",
       initialValue: "Ethan Cheng",
     }),
 
@@ -88,7 +131,6 @@ export default defineType({
       title: "Show Clients Strip",
       type: "boolean",
       group: "clients",
-      description: "Toggle the clients/publications strip on or off.",
       initialValue: true,
     }),
     defineField({
@@ -96,7 +138,6 @@ export default defineType({
       title: "Clients & Publications",
       type: "array",
       group: "clients",
-      description: "Drag to reorder. These appear as an editorial strip on the homepage.",
       of: [{ type: "string" }],
     }),
 
@@ -106,7 +147,6 @@ export default defineType({
       title: "Show Featured Article",
       type: "boolean",
       group: "feature",
-      description: "Toggle the featured article section on or off.",
       initialValue: true,
     }),
     defineField({
@@ -114,7 +154,6 @@ export default defineType({
       title: "Section Label",
       type: "string",
       group: "feature",
-      description: 'e.g. "Featured In"',
       initialValue: "Featured In",
     }),
     defineField({
@@ -129,7 +168,6 @@ export default defineType({
       title: "Issue / Subtitle",
       type: "string",
       group: "feature",
-      description: 'e.g. "Issue 198 · Can\'t Let Go"',
       initialValue: "Issue 198 · Can't Let Go",
     }),
     defineField({
@@ -153,7 +191,6 @@ export default defineType({
       title: "Credits",
       type: "array",
       group: "feature",
-      description: "Role / Name pairs shown on the card.",
       of: [
         {
           type: "object",
@@ -161,9 +198,7 @@ export default defineType({
             defineField({ name: "role", title: "Role", type: "string" }),
             defineField({ name: "name", title: "Name", type: "string" }),
           ],
-          preview: {
-            select: { title: "role", subtitle: "name" },
-          },
+          preview: { select: { title: "role", subtitle: "name" } },
         },
       ],
     }),
@@ -172,8 +207,9 @@ export default defineType({
       title: "Link URL",
       type: "url",
       group: "feature",
-      description: "External link to the article.",
       initialValue: "https://www.flaunt.com/post/lukas-gage-cant-let-go-issue",
+      validation: (Rule) =>
+        Rule.uri({ allowRelative: false, scheme: ["http", "https"] }),
     }),
     defineField({
       name: "featureLinkText",
@@ -189,7 +225,6 @@ export default defineType({
       title: "Show CTA Section",
       type: "boolean",
       group: "cta",
-      description: "Toggle the call-to-action section on or off.",
       initialValue: true,
     }),
     defineField({
@@ -224,7 +259,6 @@ export default defineType({
       initialValue: "Get in Touch",
     }),
   ],
-
   preview: {
     prepare() {
       return { title: "Site Settings" };

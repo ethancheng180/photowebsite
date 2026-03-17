@@ -1,53 +1,27 @@
-import {
-  getProjects,
-  getSiteSettings,
-  getNavigation,
-  getCategories,
-  getPortfolioSettings,
-} from "@/lib/sanity";
+import { getProjects, getSiteSettings } from "@/lib/sanity";
 import { PROJECTS as STATIC_PROJECTS } from "@/data/projects";
-import SiteClient from "../SiteClient";
+import HomePage from "@/components/HomePage";
 
 export const revalidate = 60;
 
-export default async function Home() {
-  let projects;
-  let settings = null;
-  let navigation = [];
-  let categories = [];
-  let portfolioSettings = null;
+export const metadata = {
+  title: "Ethan Cheng — Fashion & Editorial Photography",
+  description:
+    "Fashion and editorial photographer based in Los Angeles, working across New York, Paris, and Milan.",
+};
 
+export default async function HomeRoute() {
+  let projects, settings;
   try {
-    const [
-      sanityProjects,
-      sanitySettings,
-      sanityNav,
-      sanityCategories,
-      sanityPortfolio,
-    ] = await Promise.all([
+    [projects, settings] = await Promise.all([
       getProjects(),
       getSiteSettings(),
-      getNavigation(),
-      getCategories(),
-      getPortfolioSettings(),
     ]);
-
-    projects = sanityProjects.length > 0 ? sanityProjects : STATIC_PROJECTS;
-    settings = sanitySettings;
-    navigation = sanityNav || [];
-    categories = sanityCategories || [];
-    portfolioSettings = sanityPortfolio;
+    if (!projects || projects.length === 0) projects = STATIC_PROJECTS;
   } catch {
     projects = STATIC_PROJECTS;
+    settings = null;
   }
 
-  return (
-    <SiteClient
-      projects={projects}
-      settings={settings}
-      navigation={navigation}
-      categories={categories}
-      portfolioSettings={portfolioSettings}
-    />
-  );
+  return <HomePage projects={projects} settings={settings} />;
 }

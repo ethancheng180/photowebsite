@@ -3,139 +3,210 @@
 import { useState } from "react";
 import FadeIn from "./FadeIn";
 
-const CONTACT_INFO = [
-  {
-    label: "General",
-    value: (
-      <a href="mailto:contact@ethanchengphotography.com" className="contact-link">
-        contact@ethanchengphotography.com
+const DEFAULTS = {
+  pageTitle: "Inquiries",
+  contactItems: [
+    { label: "General", value: "contact@ethanchengphotography.com", type: "email", url: "contact@ethanchengphotography.com" },
+    { label: "Instagram", value: "@Ethan__cheng__", type: "link", url: "https://instagram.com/Ethan__cheng__" },
+    { label: "Based In", value: "Los Angeles, California", type: "text" },
+    { label: "Working In", value: "New York · Paris · Milan · Los Angeles", type: "text" },
+    { label: "Representation", value: "Currently seeking agency representation. Open to conversations with talent agencies and artist management groups.", type: "text" },
+  ],
+  inquiryTypes: [
+    "Editorial Commission",
+    "Campaign / Lookbook",
+    "Beauty Story",
+    "Brand Collaboration",
+    "Model Test",
+    "Press / Media",
+    "Representation",
+    "Other",
+  ],
+  formPlaceholder: "Tell me about your project, timeline, and vision.",
+  submitText: "Send Inquiry",
+  confirmationTitle: "Thank You",
+  confirmationText: "Your inquiry has been received. I'll respond within 48 hours.",
+};
+
+function d(contactData, key) {
+  return contactData?.[key] ?? DEFAULTS[key];
+}
+
+function ContactValue({ item }) {
+  if (item.type === "email") {
+    return (
+      <a href={`mailto:${item.url || item.value}`} className="contact-link">
+        {item.value}
       </a>
-    ),
-  },
-  {
-    label: "Instagram",
-    value: (
+    );
+  }
+  if (item.type === "link") {
+    return (
       <a
-        href="https://instagram.com/Ethan__cheng__"
+        href={item.url || "#"}
         target="_blank"
         rel="noopener noreferrer"
         className="contact-link"
       >
-        @Ethan__cheng__
+        {item.value}
       </a>
-    ),
-  },
-  { label: "Based In", value: "Los Angeles, California" },
-  { label: "Working In", value: "New York · Paris · Milan · Los Angeles" },
-  {
-    label: "Representation",
-    value: (
-      <span className="contact-muted">
-        Currently seeking agency representation.
-        <br />
-        Open to conversations with talent agencies
-        <br />
-        and artist management groups.
-      </span>
-    ),
-  },
-];
+    );
+  }
+  return <span>{item.value}</span>;
+}
 
-const INQUIRY_TYPES = [
-  "Select category",
-  "Editorial Commission",
-  "Campaign / Lookbook",
-  "Beauty Story",
-  "Brand Collaboration",
-  "Model Test",
-  "Press / Media",
-  "Representation",
-  "Other",
-];
+export default function ContactPage({ contactData }) {
+  const [status, setStatus] = useState("idle");
+  const [error, setError] = useState("");
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    inquiryType: "",
+    message: "",
+  });
 
-export default function ContactPage({ setPage }) {
-  const [submitted, setSubmitted] = useState(false);
+  const pageTitle = d(contactData, "pageTitle");
+  const contactItems = d(contactData, "contactItems");
+  const inquiryTypes = d(contactData, "inquiryTypes");
+  const formPlaceholder = d(contactData, "formPlaceholder");
+  const submitText = d(contactData, "submitText");
+  const confirmationTitle = d(contactData, "confirmationTitle");
+  const confirmationText = d(contactData, "confirmationText");
+
+  const handleChange = (e) => {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus("sending");
+    setError("");
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Something went wrong.");
+        setStatus("error");
+        return;
+      }
+      setStatus("success");
+    } catch {
+      setError("Network error. Please try again.");
+      setStatus("error");
+    }
+  };
 
   return (
     <div className="page-transition">
-      {/* Hero */}
       <div className="contact-hero">
         <div className="contact-hero__inner">
           <FadeIn>
-            <h1 className="contact-hero__title">Inquiries</h1>
+            <h1 className="contact-hero__title">{pageTitle}</h1>
           </FadeIn>
         </div>
       </div>
 
       <div className="contact-body">
         <div className="contact-grid">
-          {/* Left: info */}
           <div>
             <FadeIn>
-              {CONTACT_INFO.map(({ label, value }) => (
-                <div key={label} className="contact-item">
-                  <div className="contact-item__label">{label}</div>
-                  <div className="contact-item__value">{value}</div>
+              {(contactItems || []).map((item) => (
+                <div key={item.label} className="contact-item">
+                  <div className="contact-item__label">{item.label}</div>
+                  <div className="contact-item__value">
+                    <ContactValue item={item} />
+                  </div>
                 </div>
               ))}
             </FadeIn>
           </div>
 
-          {/* Right: form */}
           <div>
             <FadeIn>
-              {!submitted ? (
-                <div className="contact-form">
-                  {[
-                    { label: "Name", type: "text", placeholder: "Full name" },
-                    {
-                      label: "Email",
-                      type: "email",
-                      placeholder: "Email address",
-                    },
-                  ].map((f) => (
-                    <div key={f.label} className="contact-form__field">
-                      <label className="contact-form__label">{f.label}</label>
-                      <input
-                        className="form-input"
-                        type={f.type}
-                        placeholder={f.placeholder}
-                      />
-                    </div>
-                  ))}
+              {status === "success" ? (
+                <div className="contact-thanks">
+                  <div className="section-label">{confirmationTitle}</div>
+                  <p className="contact-thanks__text">{confirmationText}</p>
+                </div>
+              ) : (
+                <form className="contact-form" onSubmit={handleSubmit}>
                   <div className="contact-form__field">
-                    <label className="contact-form__label">Inquiry Type</label>
-                    <select className="form-select">
-                      {INQUIRY_TYPES.map((t) => (
-                        <option key={t}>{t}</option>
+                    <label className="contact-form__label" htmlFor="cf-name">
+                      Name
+                    </label>
+                    <input
+                      id="cf-name"
+                      className="form-input"
+                      type="text"
+                      name="name"
+                      placeholder="Full name"
+                      required
+                      value={form.name}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="contact-form__field">
+                    <label className="contact-form__label" htmlFor="cf-email">
+                      Email
+                    </label>
+                    <input
+                      id="cf-email"
+                      className="form-input"
+                      type="email"
+                      name="email"
+                      placeholder="Email address"
+                      required
+                      value={form.email}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="contact-form__field">
+                    <label className="contact-form__label" htmlFor="cf-type">
+                      Inquiry Type
+                    </label>
+                    <select
+                      id="cf-type"
+                      className="form-select"
+                      name="inquiryType"
+                      value={form.inquiryType}
+                      onChange={handleChange}
+                    >
+                      <option value="">Select category</option>
+                      {(inquiryTypes || []).map((t) => (
+                        <option key={t} value={t}>
+                          {t}
+                        </option>
                       ))}
                     </select>
                   </div>
                   <div className="contact-form__field">
-                    <label className="contact-form__label">Message</label>
+                    <label className="contact-form__label" htmlFor="cf-message">
+                      Message
+                    </label>
                     <textarea
+                      id="cf-message"
                       className="form-textarea"
-                      placeholder="Tell me about your project, timeline, and vision."
+                      name="message"
+                      placeholder={formPlaceholder}
+                      required
+                      value={form.message}
+                      onChange={handleChange}
                     />
                   </div>
+                  {error && <p className="contact-form__error">{error}</p>}
                   <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setSubmitted(true);
-                    }}
+                    type="submit"
                     className="contact-form__submit"
+                    disabled={status === "sending"}
                   >
-                    Send Inquiry
+                    {status === "sending" ? "Sending…" : submitText}
                   </button>
-                </div>
-              ) : (
-                <div className="contact-thanks">
-                  <div className="section-label">Thank You</div>
-                  <p className="contact-thanks__text">
-                    Your inquiry has been received. I&rsquo;ll respond within 48
-                    hours.
-                  </p>
-                </div>
+                </form>
               )}
             </FadeIn>
           </div>

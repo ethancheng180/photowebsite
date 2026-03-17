@@ -18,9 +18,8 @@ export default defineConfig({
     structureTool({
       structure: (S, context) =>
         S.list()
-          .title("Portfolio")
+          .title("Content")
           .items([
-            // ─── Singleton: Site Settings ──────────────
             S.listItem()
               .title("Site Settings")
               .icon(() => "⚙")
@@ -30,21 +29,43 @@ export default defineConfig({
                   .documentId("siteSettings")
                   .title("Site Settings")
               ),
-
-            // ─── Singleton: Portfolio Page ─────────────
-            S.listItem()
-              .title("Portfolio Page")
-              .icon(() => "◻")
-              .child(
-                S.document()
-                  .schemaType("portfolioPage")
-                  .documentId("portfolioPage")
-                  .title("Portfolio Page Settings")
-              ),
-
             S.divider(),
 
-            // ─── Orderable: Navigation ─────────────────
+            S.listItem()
+              .title("Pages")
+              .icon(() => "◻")
+              .child(
+                S.list()
+                  .title("Pages")
+                  .items([
+                    S.listItem()
+                      .title("Portfolio Page")
+                      .child(
+                        S.document()
+                          .schemaType("portfolioPage")
+                          .documentId("portfolioPage")
+                          .title("Portfolio Page")
+                      ),
+                    S.listItem()
+                      .title("About Page")
+                      .child(
+                        S.document()
+                          .schemaType("aboutPage")
+                          .documentId("aboutPage")
+                          .title("About Page")
+                      ),
+                    S.listItem()
+                      .title("Contact Page")
+                      .child(
+                        S.document()
+                          .schemaType("contactPage")
+                          .documentId("contactPage")
+                          .title("Contact Page")
+                      ),
+                  ])
+              ),
+            S.divider(),
+
             orderableDocumentListDeskItem({
               type: "navigationItem",
               title: "Navigation",
@@ -52,8 +73,6 @@ export default defineConfig({
               S,
               context,
             }),
-
-            // ─── Orderable: Categories ─────────────────
             orderableDocumentListDeskItem({
               type: "category",
               title: "Categories",
@@ -61,10 +80,8 @@ export default defineConfig({
               S,
               context,
             }),
-
             S.divider(),
 
-            // ─── Orderable: Projects ───────────────────
             orderableDocumentListDeskItem({
               type: "project",
               title: "Projects",

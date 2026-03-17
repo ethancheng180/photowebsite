@@ -47,8 +47,31 @@ export const PROJECTS_QUERY = `
   }
 `;
 
+export const PROJECT_BY_SLUG_QUERY = `
+  *[_type == "project" && slug.current == $slug][0] {
+    "id": slug.current,
+    title,
+    "category": coalesce(category->title, categoryFallback, select(defined(category._ref) => null, category)),
+    year,
+    publication,
+    description,
+    concept,
+    credits,
+    "images": count(gallery),
+    gradient,
+    accent,
+    featured,
+    cover,
+    gallery
+  }
+`;
+
 export const SITE_SETTINGS_QUERY = `
   *[_type == "siteSettings"][0] {
+    siteName,
+    socialLinks,
+    footerLocations,
+    footerCopyright,
     heroTagline,
     heroTitle,
     heroSubtitle,
@@ -71,5 +94,33 @@ export const SITE_SETTINGS_QUERY = `
     ctaTitle,
     ctaBody,
     ctaButtonText
+  }
+`;
+
+export const ABOUT_PAGE_QUERY = `
+  *[_type == "aboutPage"][0] {
+    heroTitle,
+    heroSubtitle,
+    bioLead,
+    bioBody,
+    infoBlocks[] { label, items },
+    showClients,
+    clientsLabel,
+    clients,
+    showPhilosophy,
+    philosophyLabel,
+    philosophyQuote
+  }
+`;
+
+export const CONTACT_PAGE_QUERY = `
+  *[_type == "contactPage"][0] {
+    pageTitle,
+    contactItems[] { label, value, type, url },
+    inquiryTypes,
+    formPlaceholder,
+    submitText,
+    confirmationTitle,
+    confirmationText
   }
 `;

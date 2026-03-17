@@ -1,3 +1,4 @@
+import Link from "next/link";
 import FadeIn from "./FadeIn";
 import ProjectImage, { EditorialPlaceholder } from "./ProjectImage";
 
@@ -29,7 +30,7 @@ function buildGalleryBlocks(gallery) {
   return blocks;
 }
 
-function GalleryBlock({ block, project, index }) {
+function GalleryBlock({ block, project }) {
   if (block.type === "full") {
     return (
       <FadeIn>
@@ -83,7 +84,7 @@ function GalleryBlock({ block, project, index }) {
   );
 }
 
-export default function ProjectPage({ project, setPage }) {
+export default function ProjectPage({ project }) {
   if (!project) return null;
 
   const c = project.credits || {};
@@ -100,8 +101,7 @@ export default function ProjectPage({ project, setPage }) {
   const hasGallery = project.gallery && project.gallery.length > 0;
 
   return (
-    <div className="page-transition">
-      {/* Hero */}
+    <article className="page-transition">
       <section className="project-hero">
         <div className="project-hero__bg">
           {project.cover ? (
@@ -131,9 +131,7 @@ export default function ProjectPage({ project, setPage }) {
         </div>
       </section>
 
-      {/* Body */}
       <div className="project-body">
-        {/* Description + Concept */}
         <FadeIn>
           <div className="project-text-grid">
             <p className="project-description">{project.description}</p>
@@ -141,7 +139,6 @@ export default function ProjectPage({ project, setPage }) {
           </div>
         </FadeIn>
 
-        {/* Credits */}
         {creditEntries.length > 0 && (
           <FadeIn>
             <div className="project-credits">
@@ -155,7 +152,6 @@ export default function ProjectPage({ project, setPage }) {
           </FadeIn>
         )}
 
-        {/* Lead image */}
         <FadeIn>
           <div className="image-container image-container--lead">
             {project.cover ? (
@@ -172,11 +168,10 @@ export default function ProjectPage({ project, setPage }) {
           </div>
         </FadeIn>
 
-        {/* Gallery */}
         {hasGallery ? (
           <div className="gallery-sequence">
             {buildGalleryBlocks(project.gallery).map((block, bi) => (
-              <GalleryBlock key={bi} block={block} project={project} index={bi} />
+              <GalleryBlock key={bi} block={block} project={project} />
             ))}
           </div>
         ) : (
@@ -189,7 +184,6 @@ export default function ProjectPage({ project, setPage }) {
           </FadeIn>
         )}
 
-        {/* Colophon */}
         <FadeIn>
           <div className="project-colophon">
             <div className="project-colophon__rule" />
@@ -199,19 +193,12 @@ export default function ProjectPage({ project, setPage }) {
           </div>
         </FadeIn>
 
-        {/* Back link */}
         <div className="project-back">
-          <a
-            onClick={() => {
-              setPage("portfolio");
-              window.scrollTo({ top: 0 });
-            }}
-            className="project-back__link"
-          >
+          <Link href="/portfolio" className="project-back__link">
             ← Back to Portfolio
-          </a>
+          </Link>
         </div>
       </div>
-    </div>
+    </article>
   );
 }
