@@ -1,11 +1,3 @@
-const DEFAULT_CATEGORIES = [
-  { title: "Editorial", slug: "editorial" },
-  { title: "Campaign", slug: "campaign" },
-  { title: "Beauty", slug: "beauty" },
-  { title: "Portraits", slug: "portraits" },
-  { title: "Celebrity", slug: "celebrity" },
-];
-
 export default function PortfolioFilters({
   categories,
   activeFilter,
@@ -13,8 +5,7 @@ export default function PortfolioFilters({
   visible = true,
 }) {
   if (!visible) return null;
-
-  const items = categories && categories.length > 0 ? categories : DEFAULT_CATEGORIES;
+  if (!categories || categories.length === 0) return null;
 
   return (
     <div className="portfolio-filters">
@@ -24,7 +15,7 @@ export default function PortfolioFilters({
       >
         All
       </button>
-      {items.map((cat) => (
+      {categories.map((cat) => (
         <button
           key={cat.slug || cat.title}
           className={`portfolio-filter${activeFilter === cat.title ? " active" : ""}`}

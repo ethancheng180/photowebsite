@@ -12,6 +12,7 @@ const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || "production";
 export default defineConfig({
   name: "ethan-cheng-portfolio",
   title: "Ethan Cheng — Portfolio CMS",
+  basePath: "/studio",
   projectId,
   dataset,
   plugins: [
